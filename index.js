@@ -4,32 +4,11 @@ const fs = require('fs')
 
 
 
-const generateReadme = (username, projectTitle, contributors) => {
-
+const generateReadme = (username, projectTitle, contributors, install, tableOfContent, tests) => {
 
   const readme =
     `
 ![User Avatar](${username.avatar_url})
-
-# Project Title
-  ${projectTitle.name}
-
-### Project Description
-  ${projectTitle.description}  
-
-### Contributor
-  ${contributors[0].login}
-  ${contributors[1].login}
-  ${contributors[2].login}
-  ${contributors[3].login}
-  ${contributors.login}
-
-### Installation Instructions
-${install}
-
-### License
-key: ${ projectTitle.license}
-name: ${ projectTitle.license}
 
 ### Username
 ${ username.login}
@@ -37,7 +16,32 @@ ${ username.login}
 ### Email:
 ${ username.email}
 
- 
+# Project Title
+  ${projectTitle.name}
+
+### Project Description
+  ${projectTitle.description}  
+
+### Table of Content
+${tableOfContent}
+
+### Contributor
+  ${contributors[0].login}
+  ${contributors[1].login}
+  ${contributors.login}
+  
+
+### Installation Instructions
+${install}
+
+### License
+key: ${ projectTitle.license.key}
+name: ${ projectTitle.license.name}
+
+### Tests
+${tests}
+
+
       `
   fs.writeFile('README.md', readme, e => e ? console.log(e) : null)
 
@@ -53,18 +57,28 @@ prompt([
     type: 'input',
     name: 'projectTitle',
     message: 'What is the name of your project?'
-
   },
   {
     type: 'input',
     name: 'install',
     message: 'Please describe the installation process'
+  },
+  {
+    type: 'input',
+    name: 'tableOfContent',
+    message: 'Please create the table of content'
+  },
+  {
+    type: 'input',
+    name: 'tests',
+    message: 'Please describe your test'
   }
 
 ])
 
 
-  .then(({ username, projectTitle, contributors }) => {
+
+  .then(({ username, projectTitle, contributors, install, tableOfContent, tests }) => {
     axios.get(`https://api.github.com/users/${username}`)
       .then(({ data: user }) => {
         axios.get(`https://api.github.com/repos/${username}/${projectTitle}`)
@@ -74,27 +88,16 @@ prompt([
 
                 for (let i = 0; i < contributors.length; i++) {
 
-
                   console.log(contributors[i].login)
 
-
-                  generateReadme(user, title, contributors)
+                  generateReadme(user, title, contributors, install, tableOfContent, tests)
 
                 }
-                // console.log('User call ---------------')
-                // console.log(user)
-                // console.log('Title/project call --------------')
-                // console.log(title)
-                // console.log('Contributor call -------------------')
-                // console.log(contributors)
-                //return conArr
-
-
 
               })
 
           })
-        // .catch(e => console.error(e))
+
 
       })
 
